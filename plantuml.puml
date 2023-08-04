@@ -1,0 +1,33 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+participant Transaction_A as tranA
+database Database as DB
+participant Transaction_B as tranB
+
+autonumber
+note right of DB
+bill
+<issue_time, is_sync>
+<1, 0>
+<2, 0>
+end note
+
+tranA -> DB : START TRANSACTION
+tranB -> DB : START TRANSACTION
+tranA -> DB : SELECT COUNT(1) AS COUNTER FROM bill \n WHERE is_sync = 0 and issue_time <= 2
+DB -> tranA
+note left
+2
+end note
+
+tranB -> DB : INSERT INTO bill (issue_time, is_sync) \n VALUES (2, 0)
+tranB -> DB : COMMIT
+
+tranA -> DB : UPDATE bill SET <b>is_sync = 1 \n WHERE is_sync = 0 and issue_time <= 2
+tranA -> DB : SELECT COUNT(1) AS COUNTER FROM bill \n WHERE <b>is_sync = 1
+DB -> tranA
+note left
+2 or 3 ?
+end note
+@enduml
