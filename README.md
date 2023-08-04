@@ -10,10 +10,11 @@ JAVA, testcontainers
 
 ### Result
 
-Expect the return is 2.
+Expect the return is **2**.
 
-| database     | isolation | return                         |
-|--------------|-----------|--------------------------------|
-| MySQL 5.7, 8 | RR        | 3                              |
-| MySQL 5.7, 8 | SER       | "Lock wait timeout" on step 5. |
-| Postgres 9   | RR        | 2                              |
+| database     | isolation       | return                         |
+|--------------|-----------------|--------------------------------|
+| MySQL 5.7, 8 | REPEATABLE_READ | 3                              |
+| MySQL 5.7, 8 | SERIALIZABLE    | "Lock wait timeout" on step 5. |
+| Postgres 9   | REPEATABLE_READ | 2                              |
+| Postgres 9   | READ_COMMITTED  | 3                              |
