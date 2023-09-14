@@ -1,3 +1,5 @@
+package phenomena;
+
 import org.testcontainers.utility.DockerImageName;
 
 public class TestImages {
