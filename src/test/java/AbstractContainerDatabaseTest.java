@@ -1,17 +1,20 @@
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.testcontainers.containers.JdbcDatabaseContainer;
 
 import java.sql.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractContainerDatabaseTest {
 
     protected JdbcDatabaseContainer<?> container = getContainer();
 
-    protected abstract int getIsolationLevel();
+    protected abstract int[] getIsolationLevels();
 
     protected abstract JdbcDatabaseContainer<?> getContainer();
 
@@ -25,13 +28,14 @@ public abstract class AbstractContainerDatabaseTest {
         container.close();
     }
 
-    @Test
-    public void test() throws SQLException {
+    @ParameterizedTest
+    @MethodSource("getIsolationLevels")
+    public void test(int isolationLevel) throws SQLException {
         try (Connection connectionA = getConnection(container);
              Connection connectionB = getConnection(container)) {
 
-            connectionA.setTransactionIsolation(getIsolationLevel());
-            connectionB.setTransactionIsolation(getIsolationLevel());
+            connectionA.setTransactionIsolation(isolationLevel);
+            connectionB.setTransactionIsolation(isolationLevel);
 
             connectionA.setAutoCommit(false);
             connectionB.setAutoCommit(false);
@@ -53,7 +57,7 @@ public abstract class AbstractContainerDatabaseTest {
             ResultSet A_get = performQuery(connectionA, "SELECT COUNT(1) AS COUNTER FROM bill WHERE is_sync = 1");
             A_get.next();
             int count = A_get.getInt(1);
-            assertThat(count).as("A transaction SELECT query succeeds").isEqualTo(2);
+            assertThat(count).as("A transaction SELECT query on isolation level: " + isolationLevel).isEqualTo(2);
         }
     }
 

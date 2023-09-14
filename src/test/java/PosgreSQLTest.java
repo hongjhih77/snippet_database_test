@@ -17,8 +17,8 @@ public class PosgreSQLTest extends AbstractContainerDatabaseTest {
             .withInitScript("table_create.sql");
 
     @Override
-    protected int getIsolationLevel() {
-        return Connection.TRANSACTION_REPEATABLE_READ;
+    protected int[] getIsolationLevels() {
+        return new int[]{Connection.TRANSACTION_REPEATABLE_READ, Connection.TRANSACTION_SERIALIZABLE};
     }
 
     @Override
