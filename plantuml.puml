@@ -8,9 +8,9 @@ participant Transaction_B as tranB
 autonumber
 note right of DB
 bill
-<issue_time, is_sync>
-<1, 0>
-<2, 0>
+<bill_id, issue_time, is_sync>
+<A, 2, 0>
+<B, 2, 0>
 end note
 
 tranA -> DB : START TRANSACTION
@@ -18,17 +18,32 @@ tranB -> DB : START TRANSACTION
 tranA -> DB : SELECT COUNT(1) AS COUNTER FROM bill \n WHERE is_sync = 0 and issue_time <= 2
 DB -> tranA
 note left
-2
+<bill_id, issue_time, is_sync>
+<A, 2, 0>
+<B, 2, 0>
+end note
+tranA -> tranA : Extract A, B to another DB
+
+tranB -> DB : INSERT INTO bill (bill_id, issue_time, is_sync) \n VALUES (C, 2, 0)
+tranB -> DB : COMMIT
+note right
+<bill_id, issue_time, is_sync>
+<A, 2, 0>
+<B, 2, 0>
+<C, 2, 0>
 end note
 
-tranB -> DB : INSERT INTO bill (issue_time, is_sync) \n VALUES (2, 0)
-tranB -> DB : COMMIT
-
 tranA -> DB : UPDATE bill SET <b>is_sync = 1 \n WHERE is_sync = 0 and issue_time <= 2
+note left
+<bill_id, issue_time, is_sync>
+<A, 2, 1>
+<B, 2, 1>
+<font color=red><b><C, 2, 1></b>
+end note
 tranA -> DB : COMMIT
 tranA -> DB : SELECT COUNT(1) AS COUNTER FROM bill \n WHERE <b>is_sync = 1
 DB -> tranA
 note left
-2 or 3 ?
+3
 end note
 @enduml
