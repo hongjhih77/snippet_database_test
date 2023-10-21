@@ -6,7 +6,13 @@ JAVA, testcontainers
 
 ### The context of the bug
 
-![plantuml.png](plantuml.png)
+![write_skew.png](write_skew.png)
+
+#### How to fix it?
+Change Sept 8. to
+```SQL
+UPDATE bill SET is_sync = 1  WHERE bill_id in (A,B);
+```
 
 ### Result
 
