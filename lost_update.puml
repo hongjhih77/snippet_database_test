@@ -1,0 +1,46 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+participant Transaction_A as tranA
+database Database as DB
+participant Transaction_B as tranB
+
+autonumber
+
+note right of DB
+Inventory
+<item_id, quantity>
+<1, 10>
+end note
+
+tranA -> DB : START TRANSACTION
+tranB -> DB : START TRANSACTION
+
+tranA -> DB : SELECT item_id, quantity FROM \n Inventory WHERE item_id = 1
+note left
+<item_id, quantity>
+<1, 10>
+end note
+tranB -> DB : SELECT item_id, quantity FROM \n Inventory WHERE item_id = 1
+note right
+<item_id, quantity>
+<1, 10>
+end note
+
+hnote over tranA: sell 4 items
+hnote over tranB: sell 1 item
+
+tranA -> DB : UPDATE Inventory SET quantity = 6 \n WHERE item_id = 1
+tranA -> DB : COMMIT
+note left
+<item_id, quantity>
+<1, 6>
+end note
+
+tranB -> DB : UPDATE Inventory SET quantity = 9 \n WHERE item_id = 1;
+tranB -> DB : COMMIT
+note right
+<item_id, quantity>
+<font color=red><b><1, 9>
+end note
+@enduml

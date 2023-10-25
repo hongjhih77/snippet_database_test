@@ -24,3 +24,30 @@ Expect the return is **2**.
 | MySQL 5.7, 8 | SERIALIZABLE    | "Lock wait timeout" on step 5. |
 | Postgres 9   | REPEATABLE_READ | 2                              |
 | Postgres 9   | READ_COMMITTED  | 3                              |
+
+## Bonus test for LOST UPDATE
+
+### Simulation
+![lost_update.png](lost_update.png)
+
+#### How to fix it on R-R isolation in MySQL?
+1. Atomic Operations
+```
+item_id UNSIGNED INT
+```
+```SQL
+UPDATE Inventory SET quantity = quantity - 4 WHERE item_id = 1
+```
+2. LOCK
+```SQL
+SELECT item_id, quantity FROM  Inventory WHERE item_id = 1 FOR UPDATE;
+```
+
+### Result
+Expect the quantity of item 1 is **6**.
+
+| database     | isolation       | quantity of item 1                                                  |
+|--------------|-----------------|---------------------------------------------------------------------|
+| MySQL 5.7, 8 | REPEATABLE_READ | 9                                                                   |
+| MySQL 5.7, 8 | SERIALIZABLE    | "Lock wait timeout" on step 5.                                      |
+| Postgres 9   | REPEATABLE_READ | 6 "could not serialize access due to concurrent update"  on step 7. |
